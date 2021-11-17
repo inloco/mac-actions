@@ -1,1 +1,1 @@
-# mac-actions
+# mactions

@@ -1,0 +1,33 @@
+name: Continuous
+on: push
+jobs:
+  all:
+    runs-on: macos-11
+    steps:
+      - name: install and setup casks
+        run: |
+          brew install --cask packages vagrant vagrant-vmware-utility vmware-fusion
+          sudo /Applications/VMware\ Fusion.app/Contents/Library/licenses/vmware-licenseTool enter '${{ secrets.VMWARE_FUSION_SERIAL_NUMBER }}' '' '' '12.0' 'VMware Fusion for Mac OS' ''
+          until vctl system start; do :; done;
+          vagrant plugin install vagrant-vmware-desktop
+      - name: install and setup formulae
+        run: |
+          brew install --formula jq packer skopeo
+          skopeo login -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}' ghcr.io
+      - name: install and setup macbox
+        run: |
+          until skopeo copy --debug --command-timeout 7m30s 'docker://ghcr.io/inloco/macbox:latest' "dir://$(pwd)/macbox"; do :; done;
+          mkdir -p ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
+          tar -zxvf "./macbox/$(jq -r '.layers[] | select(.annotations."org.opencontainers.image.title" | endswith(".box")).digest | split(":")[-1]' ./macbox/manifest.json)" -C ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
+      - name: checkout repository
+        uses: actions/checkout@v2
+      - name: make all
+        run: make
+        env:
+          PACKER_LOG: '1'
+          VAGRANT_LOG: debug
+      - name: docker push
+        run: make "TAG=$(git describe --dirty --broken --always)" -C oci push
+      - name: docker tag
+        run: make "TAG=$(git describe --dirty --broken --always)" -C oci latest
+        if: github.ref == 'refs/heads/master'
