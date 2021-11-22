@@ -33,14 +33,18 @@ build {
       "/private/tmp/brew.sh",
       "rm -f /private/tmp/brew.sh",
 
-      "brew install --formula mas xcinfo",
-      "brew install --cask intel-haxm",
-
+      # "brew install --formula mas",
       # "mas install 497799835",
+      # "brew install --formula xcinfo",
       # "xcinfo install ${var.xcode-version}",
       "curl -fLo /private/tmp/Xcode.xip https://macbox.s3.amazonaws.com/Xcode_${var.xcode-version}.xip",
       "cd /Applications && xip -x /private/tmp/Xcode.xip",
       "rm -f /private/tmp/Xcode.xip",
+      "sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer",
+      "sudo xcodebuild -license accept",
+
+      "brew install --cask android-commandlinetools android-platform-tools intel-haxm temurin",
+      "yes | sdkmanager --licenses",
 
       "sudo mkdir -p /opt/actions-runner",
       "sudo chown 501:20 /opt/actions-runner",
