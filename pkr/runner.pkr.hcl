@@ -15,8 +15,8 @@ variable "xcode-version" {
 
 source "vagrant" "runner" {
   communicator = "ssh"
-  source_path = "incognia/macbox"
-  provider = "vmware_fusion"
+  source_path  = "incognia/macbox"
+  provider     = "vmware_fusion"
 }
 
 build {
@@ -26,8 +26,16 @@ build {
     "sources.vagrant.runner",
   ]
 
+  provisioner "file" {
+    source      = "./ssh-environment-path-helper.sh"
+    destination = "/private/tmp/ssh-environment-path-helper.sh"
+  }
+
   provisioner "shell" {
     inline = [
+      "cat /private/tmp/ssh-environment-path-helper.sh | sudo tee /private/var/root/.local/bin/ssh-environment-path-helper > /dev/null",
+      "rm -f /private/tmp/ssh-environment-path-helper.sh",
+
       "curl -fLo /private/tmp/brew.sh https://raw.githubusercontent.com/Homebrew/install/${var.brew-version}/install.sh",
       "chmod +x /private/tmp/brew.sh",
       "/private/tmp/brew.sh",
