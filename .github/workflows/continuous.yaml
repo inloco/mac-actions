@@ -16,7 +16,7 @@ jobs:
           skopeo login -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}' ghcr.io
       - name: install and setup macbox
         run: |
-          until skopeo copy --debug --command-timeout 7m30s 'docker://ghcr.io/inloco/macbox:latest' "dir://$(pwd)/macbox"; do :; done;
+          until skopeo copy --debug --command-timeout 15m 'docker://ghcr.io/inloco/macbox:latest' "dir://$(pwd)/macbox"; do :; done;
           mkdir -p ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
           tar -zxvf "./macbox/$(jq -r '.layers[] | select(.annotations."org.opencontainers.image.title" | endswith(".box")).digest | split(":")[-1]' ./macbox/manifest.json)" -C ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
       - name: checkout repository
