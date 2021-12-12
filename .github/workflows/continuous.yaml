@@ -3,6 +3,8 @@ on: push
 jobs:
   all:
     runs-on: macos-11
+    permissions:
+      packages: write
     steps:
       - name: install and setup casks
         run: |
