@@ -10,7 +10,7 @@ variable "brew-version" {
 
 variable "xcode-version" {
   type    =  string
-  default = "13.1"
+  default = "13.2.1"
 }
 
 source "vagrant" "runner" {
