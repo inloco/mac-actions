@@ -11,7 +11,7 @@ jobs:
         run: |
           brew install --cask packages vagrant vagrant-vmware-utility vmware-fusion
           sudo /Applications/VMware\ Fusion.app/Contents/Library/licenses/vmware-licenseTool enter '${{ secrets.VMWARE_FUSION_SERIAL_NUMBER }}' '' '' '12.0' 'VMware Fusion for Mac OS' ''
-          until vctl system start; do :; done;
+          until vctl system start; do :; done && vctl system stop
           vagrant plugin install vagrant-vmware-desktop
       - name: install and setup formulae
         run: |
