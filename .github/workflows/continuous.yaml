@@ -1,5 +1,8 @@
 name: Continuous
-on: push
+on:
+  push:
+    branches:
+      - master
 permissions:
   contents: read
   packages: write
@@ -31,8 +34,7 @@ jobs:
         env:
           PACKER_LOG: '1'
           VAGRANT_LOG: debug
-      - name: docker push
-        run: make "TAG=$(git describe --dirty --broken --always)" -C oci push
-      - name: docker tag
-        run: make "TAG=$(git describe --dirty --broken --always)" -C oci latest
-        if: github.ref == 'refs/heads/master'
+      - name: make docker
+        run: |
+          make "TAG=$(git describe --dirty --broken --always)" -C oci push
+          make "TAG=$(git describe --dirty --broken --always)" -C oci latest
