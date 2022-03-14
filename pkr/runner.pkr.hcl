@@ -41,6 +41,8 @@ build {
       "curl -fLo /private/tmp/Xcode.xip https://macbox.s3.amazonaws.com/Xcode_${var.xcode-version}.xip",
       "cd /Applications && xip -x /private/tmp/Xcode.xip",
       "rm -f /private/tmp/Xcode.xip",
+      "sudo xcode-select -s /Applications/Xcode.app",
+      "sudo xcodebuild -license accept",
 
       "sudo mkdir -p /opt/actions-runner",
       "sudo chown 501:20 /opt/actions-runner",
