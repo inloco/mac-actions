@@ -6,4 +6,4 @@ do
     :
 done
 
-vctl system stop
+vctl system stop --force
