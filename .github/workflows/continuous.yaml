@@ -19,11 +19,15 @@ jobs:
           brew install --cask packages vagrant vagrant-vmware-utility vmware-fusion
           sh ./hack/kickstart-vmware.sh '${{ secrets.VMWARE_FUSION_SERIAL_NUMBER }}'
           vagrant plugin install vagrant-vmware-desktop
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
       - name: install and setup formulae
         run: |
           brew install --formula jq packer skopeo
           sh ./hack/unttify-skopeo.sh
           skopeo login -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}' ghcr.io
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
       - name: install and setup macbox
         run: |
           skopeo copy --debug --command-timeout 1h 'docker://ghcr.io/inloco/macbox:latest' "dir://$(pwd)/macbox"
