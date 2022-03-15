@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
+      - name: purge xcode
+        run: sh ./hack/purge-xcode.sh
       - name: install unttify
         run: cp ./hack/unttify.py /usr/local/bin/unttify
       - name: install and setup casks
@@ -38,7 +40,27 @@ jobs:
         env:
           PACKER_LOG: '1'
           VAGRANT_LOG: debug
-      - name: make docker
+      - name: aws configure
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/ecr-public
+      - name: docker login
         run: |
-          make "TAG=$(git describe --dirty --broken --always)" -C oci push
-          make "TAG=$(git describe --dirty --broken --always)" -C oci latest
+          # skopeo login -u '${{ secrets.DOCKER_USER }}' -p '${{ secrets.DOCKER_PASS }}' docker.io
+          skopeo login -u '${{ github.actor }}' -p '${{ github.token }}' ghcr.io
+          aws ecr-public get-login-password | skopeo login -u AWS --password-stdin public.ecr.aws
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: docker push
+        shell: '/usr/bin/env parallel --lb :::: {0}'
+        run: |
+          # make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/macbox' -C oci push
+          make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=inloco/macbox' -C oci push
+          make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/macbox' -C oci push
+      - name: docker tag
+        shell: '/usr/bin/env parallel --lb :::: {0}'
+        run: |
+          # make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/macbox' -C oci latest
+          make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=inloco/macbox' -C oci latest
+          make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/macbox' -C oci latest

@@ -6,7 +6,10 @@ YLW := \033[33m
 BLU := \033[34m
 EOL := \n
 
-TAG ?= latest
+IMAGE_REGISTRY ?= docker.io
+IMAGE_REPOSITORY ?= incognia/macbox
+IMAGE_VERSION ?= $(shell git describe --dirty --broken --always)
+IMAGE_VARIANT ?= 
 
 all: build/manifest.json
 	@printf '${BLD}${RED}make: *** [$@]${RST}${EOL}'
@@ -21,13 +24,13 @@ clean:
 push:
 	@printf '${BLD}${RED}make: *** [$@]${RST}${EOL}'
 	@printf '${BLD}${YLW}$$${RST} '
-	skopeo copy "dir://$$(pwd)/build" 'docker://ghcr.io/inloco/mactions:${TAG}'
+	skopeo copy "dir://$$(pwd)/build" 'docker://${IMAGE_REGISTRY}/${IMAGE_REPOSITORY}:${IMAGE_VERSION}${IMAGE_VARIANT}'
 .PHONY: push
 
 latest:
 	@printf '${BLD}${RED}make: *** [$@]${RST}${EOL}'
 	@printf '${BLD}${YLW}$$${RST} '
-	skopeo copy 'docker://ghcr.io/inloco/mactions:${TAG}' 'docker://ghcr.io/inloco/mactions:latest'
+	skopeo copy 'docker://${IMAGE_REGISTRY}/${IMAGE_REPOSITORY}:${IMAGE_VERSION}${IMAGE_VARIANT}' 'docker://${IMAGE_REGISTRY}/${IMAGE_REPOSITORY}:latest'
 .PHONY: push
 
 build/manifest.json: box2dir.sh ../pkr/output-runner/package.box 
