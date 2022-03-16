@@ -9,6 +9,11 @@ permissions:
 jobs:
   all:
     runs-on: macos-11
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+      PACKER_LOG: '1'
+      VAGRANT_LOG: debug
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
@@ -19,16 +24,12 @@ jobs:
           brew install --cask packages vagrant vagrant-vmware-utility vmware-fusion
           sh ./hack/kickstart-vmware.sh '${{ secrets.VMWARE_FUSION_SERIAL_NUMBER }}'
           vagrant plugin install vagrant-vmware-desktop
-        env:
-          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
       - name: install and setup formulae
         run: |
           brew install --formula jq packer parallel skopeo
           sh ./hack/cite-parallel.sh
           sh ./hack/unttify-skopeo.sh
           skopeo login -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}' ghcr.io
-        env:
-          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
       - name: purge xcode
         run: sh ./hack/purge-xcode.sh
       - name: install and setup macbox
@@ -41,9 +42,6 @@ jobs:
           make
           make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=inloco/macbox' -C oci push
           make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=inloco/macbox' -C oci latest
-        env:
-          PACKER_LOG: '1'
-          VAGRANT_LOG: debug
       # - name: aws configure
       #   uses: aws-actions/configure-aws-credentials@v1
       #   with:
@@ -54,8 +52,6 @@ jobs:
       #     # skopeo login -u '${{ secrets.DOCKER_USER }}' -p '${{ secrets.DOCKER_PASS }}' docker.io
       #     skopeo login -u '${{ github.actor }}' -p '${{ github.token }}' ghcr.io
       #     aws ecr-public get-login-password | skopeo login -u AWS --password-stdin public.ecr.aws
-      #   env:
-      #     AWS_REGION: ${{ secrets.AWS_REGION }}
       # - name: docker push
       #   shell: '/usr/bin/env parallel --lb :::: {0}'
       #   run: |
