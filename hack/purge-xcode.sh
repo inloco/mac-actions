@@ -16,41 +16,41 @@ find /Applications -type l -maxdepth 1 -delete
     do
         echo "find '${D}' -type f -delete"
     done
-} | parallel --lb ::::
+} | parallel --lb
 
 {
     for D in /Applications/Xcode_*.app/Contents/Developer/Platforms/*.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/*.simruntime
     do
         echo "find '${D}' -type f -delete"
     done
-} | parallel --lb ::::
+} | parallel --lb
 
 {
     for D in /Applications/Xcode_*.app/Contents/Developer/Platforms/*.platform
     do
         echo "find '${D}' -type f -delete"
     done
-} | parallel --lb ::::
+} | parallel --lb
 
 {
     for D in /Applications/Xcode_*.app/Contents/Developer
     do
         echo "find '${D}' -type f -delete"
     done
-} | parallel --lb ::::
+} | parallel --lb
 
 {
     for D in /Applications/Xcode_*.app/Contents
     do
         echo "find '${D}' -type f -delete"
     done
-} | parallel --lb ::::
+} | parallel --lb
 
 {
     for D in /Applications/Xcode_*.app
     do
         echo "find '${D}' -type f -delete"
     done
-} | parallel --lb ::::
+} | parallel --lb
 
 rm -fR /Applications/Xcode_*.app

@@ -39,30 +39,25 @@ jobs:
           tar -zxvf "./macbox/$(jq -r '.layers[] | select(.annotations."org.opencontainers.image.title" | endswith(".box")).digest | split(":")[-1]' ./macbox/manifest.json)" -C ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
       - name: make all
         run: make
-      - name: make docker
+      - name: aws configure
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/ecr-public
+      - name: docker login
         run: |
+          # skopeo login -u '${{ secrets.DOCKER_USER }}' -p '${{ secrets.DOCKER_PASS }}' docker.io
           skopeo login -u '${{ github.actor }}' -p '${{ github.token }}' ghcr.io
+          aws ecr-public get-login-password | skopeo login -u AWS --password-stdin public.ecr.aws
+      - name: docker push
+        shell: '/usr/bin/env parallel --lb :::: {0}'
+        run: |
+          # make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci push
           make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=${{ github.repository }}' -C oci push
+          make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci push
+      - name: docker tag
+        shell: '/usr/bin/env parallel --lb :::: {0}'
+        run: |
+          # make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci latest
           make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=${{ github.repository }}' -C oci latest
-      # - name: aws configure
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-region: ${{ secrets.AWS_REGION }}
-      #     role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/ecr-public
-      # - name: docker login
-      #   run: |
-      #     # skopeo login -u '${{ secrets.DOCKER_USER }}' -p '${{ secrets.DOCKER_PASS }}' docker.io
-      #     skopeo login -u '${{ github.actor }}' -p '${{ github.token }}' ghcr.io
-      #     aws ecr-public get-login-password | skopeo login -u AWS --password-stdin public.ecr.aws
-      # - name: docker push
-      #   shell: '/usr/bin/env parallel --lb :::: {0}'
-      #   run: |
-      #     # make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci push
-      #     make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=${{ github.repository }}' -C oci push
-      #     make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci push
-      # - name: docker tag
-      #   shell: '/usr/bin/env parallel --lb :::: {0}'
-      #   run: |
-      #     # make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci latest
-      #     make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=${{ github.repository }}' -C oci latest
-      #     make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci latest
+          make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci latest

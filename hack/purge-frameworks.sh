@@ -6,6 +6,6 @@ set -ex
     do
         echo "find '${D}' -type f -delete"
     done
-} | parallel --lb ::::
+} | parallel --lb
 
 rm -fR /Library/Frameworks/Mono.* /Library/Frameworks/Xamarin.*
