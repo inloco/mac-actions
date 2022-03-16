@@ -30,8 +30,8 @@ jobs:
           sh ./hack/cite-parallel.sh
           sh ./hack/unttify-skopeo.sh
           skopeo login -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}' ghcr.io
-      - name: purge xcode
-        run: sh ./hack/purge-xcode.sh
+      - name: purge frameworks
+        run: sudo ./hack/purge-frameworks.sh
       - name: install and setup macbox
         run: |
           skopeo copy --debug --command-timeout 1h 'docker://ghcr.io/inloco/macbox:latest' "dir://$(pwd)/macbox"

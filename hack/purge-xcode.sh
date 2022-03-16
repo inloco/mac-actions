@@ -53,4 +53,4 @@ find /Applications -type l -maxdepth 1 -delete
     done
 } | parallel --lb ::::
 
-# rm -fR /Applications/Xcode_*.app
+rm -fR /Applications/Xcode_*.app
