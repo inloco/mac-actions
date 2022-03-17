@@ -13,6 +13,7 @@ jobs:
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+      PACKER_GITHUB_API_TOKEN: ${{ github.token }}
       PACKER_LOG: '1'
       VAGRANT_LOG: debug
     steps:
