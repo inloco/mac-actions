@@ -49,7 +49,7 @@ jobs:
         run: |
           # skopeo login -u '${{ secrets.DOCKER_USER }}' -p '${{ secrets.DOCKER_PASS }}' docker.io
           skopeo login -u '${{ github.actor }}' -p '${{ github.token }}' ghcr.io
-          aws ecr-public get-login-password | skopeo login -u AWS --password-stdin public.ecr.aws
+          skopeo login -u 'AWS' -p "$(aws ecr-public get-login-password)" public.ecr.aws
       - name: docker push
         shell: '/usr/bin/env parallel --lb :::: {0}'
         run: |
