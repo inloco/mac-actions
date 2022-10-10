@@ -1,6 +1,6 @@
 variable "actions-version" {
   type    =  string
-  default = "2.284.0"
+  default = "2.298.2"
 }
 
 variable "brew-version" {
@@ -10,7 +10,7 @@ variable "brew-version" {
 
 variable "xcode-version" {
   type    =  string
-  default = "13.2.1"
+  default = "13.4.1"
 }
 
 source "vagrant" "runner" {
