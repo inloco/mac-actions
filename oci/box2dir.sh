@@ -6,15 +6,20 @@ function realpath {
 }
 
 BOXPATH="$(realpath "${1}")"
-BOXSIZE="$(stat -f '%z' "${BOXPATH}")"
 BOXMODIFIED="$(date -ur "$(stat -f '%m' "${BOXPATH}")" '+%Y-%m-%dT%H:%M:%SZ')"
-BOXSHA256="$(shasum -a 256 "${BOXPATH}" | awk '{ print $1 }')"
 
 TMPDIR="$(mktemp -d)"
 
 echo 'Directory Transport Version: 1.1' > "${TMPDIR}/version"
 
-ln -s "${BOXPATH}" "${TMPDIR}/${BOXSHA256}"
+split -b 4G "${BOXPATH}"
+for PART in ./x*
+do
+  PARTSHA256="$(shasum -a 256 "${PART}" | awk '{ print $1 }')"
+  mv "${PART}" "${TMPDIR}/${PARTSHA256}"
+
+  PARTSHA256S+=("${PARTSHA256}")
+done
 
 CONFIGPATH="${TMPDIR}/config.json"
 cat << EOF > "${CONFIGPATH}"
@@ -25,7 +30,15 @@ cat << EOF > "${CONFIGPATH}"
   "rootfs": {
     "type": "layers",
     "diff_ids": [
-      "sha256:${BOXSHA256}"
+$(
+  for PARTSHA256 in "${PARTSHA256S[@]}"
+  do
+    ((++I))
+
+    EOL="$([ "${I}" = "${#PARTSHA256S[@]}" ] || echo ',')"
+    echo '      "sha256:'"${PARTSHA256}"'"'"${EOL}"
+  done
+)
     ]
   }
 }
@@ -45,14 +58,19 @@ cat << EOF > "${TMPDIR}/manifest.json"
     "size": ${CONFIGSIZE}
   },
   "layers": [
-    {
-      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
-      "digest": "sha256:${BOXSHA256}",
-      "size": ${BOXSIZE},
-      "annotations": {
-        "org.opencontainers.image.title": "package.box"
-      }
-    }
+$(
+  for PARTSHA256 in "${PARTSHA256S[@]}"
+  do
+    ((++I))
+
+    EOL="$([ "${I}" = "${#PARTSHA256S[@]}" ] || echo ',')"
+    echo '    {'
+    echo '      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",'
+    echo '      "digest": "sha256:'"${PARTSHA256}"'",'
+    echo '      "size": '"$(stat -f '%z' "${TMPDIR}/${PARTSHA256}")"
+    echo '    }'"${EOL}"
+  done
+)
   ],
   "annotations": {
     "com.github.package.type": "vagrant_box",
