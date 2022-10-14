@@ -10,3 +10,4 @@ crash.log
 # Artifacts
 build/
 output-*/
+x*

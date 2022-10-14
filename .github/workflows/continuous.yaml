@@ -37,7 +37,7 @@ jobs:
         run: |
           skopeo copy --debug --command-timeout 1h 'docker://docker.io/inloco/macbox:latest' "dir://$(pwd)/macbox"
           mkdir -p ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
-          tar -zxvf "./macbox/$(jq -r '.layers[0].digest | split(":")[-1]' ./macbox/manifest.json)" -C ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
+          cat $(jq -r '.layers[].digest | "./macbox/" + split(":")[-1]' ./macbox/manifest.json) | tar -zxvC ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
       - name: make all
         run: make
       - name: aws configure
@@ -48,20 +48,20 @@ jobs:
       - name: docker login
         run: |
           skopeo login -u '${{ secrets.DOCKERHUB_USER }}' -p '${{ secrets.DOCKERHUB_PASS }}' docker.io
-          # skopeo login -u '${{ secrets.QUAY_USER }}' -p '${{ secrets.QUAY_PASS }}' quay.io
+          skopeo login -u '${{ secrets.QUAY_USER }}' -p '${{ secrets.QUAY_PASS }}' quay.io
           skopeo login -u '${{ github.actor }}' -p '${{ github.token }}' ghcr.io
-          # skopeo login -u 'AWS' -p "$(aws ecr-public get-login-password)" public.ecr.aws
+          skopeo login -u 'AWS' -p "$(aws ecr-public get-login-password)" public.ecr.aws
       - name: docker push
         shell: '/usr/bin/env parallel --lb :::: {0}'
         run: |
           make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci push
-          # make 'IMAGE_REGISTRY=quay.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci push
+          make 'IMAGE_REGISTRY=quay.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci push
           make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=${{ github.repository }}' -C oci push
-          # make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci push
+          make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci push
       - name: docker tag
         shell: '/usr/bin/env parallel --lb :::: {0}'
         run: |
           make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci latest
-          # make 'IMAGE_REGISTRY=quay.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci latest
+          make 'IMAGE_REGISTRY=quay.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci latest
           make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=${{ github.repository }}' -C oci latest
-          # make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci latest
+          make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci latest
