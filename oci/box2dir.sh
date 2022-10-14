@@ -12,7 +12,7 @@ TMPDIR="$(mktemp -d)"
 
 echo 'Directory Transport Version: 1.1' > "${TMPDIR}/version"
 
-split -b 4G "${BOXPATH}"
+split -b "$((4 * 1024 * 1024 * 1024))" "${BOXPATH}"
 for PART in ./x*
 do
   PARTSHA256="$(shasum -a 256 "${PART}" | awk '{ print $1 }')"
