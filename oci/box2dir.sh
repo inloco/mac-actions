@@ -65,7 +65,7 @@ $(
 
     EOL="$([ "${I}" = "${#PARTSHA256S[@]}" ] || echo ',')"
     echo '    {'
-    echo '      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",'
+    echo '      "mediaType": "application/octet-stream",'
     echo '      "digest": "sha256:'"${PARTSHA256}"'",'
     echo '      "size": '"$(stat -f '%z' "${TMPDIR}/${PARTSHA256}")"
     echo '    }'"${EOL}"
