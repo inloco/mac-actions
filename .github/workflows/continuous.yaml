@@ -37,7 +37,7 @@ jobs:
         run: |
           skopeo copy --debug --command-timeout 1h 'docker://docker.io/inloco/macbox:latest' "dir://$(pwd)/macbox"
           mkdir -p ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
-          cat $(jq -r '.layers[].digest | "./macbox/" + split(":")[-1]' ./macbox/manifest.json) | tar -zxvC ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
+          zcat -cf $(jq -r '.layers[].digest | "./macbox/" + split(":")[-1]' ./macbox/manifest.json) | tar -xvC ~/.vagrant.d/boxes/incognia-VAGRANTSLASH-macbox/0/vmware_fusion
       - name: make all
         run: make
       - name: aws configure
