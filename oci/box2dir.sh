@@ -18,9 +18,11 @@ for PART in ./x*
 do
   tgzarmorer "${PART}" > "${TMPTGZ}"
 
+  rm -fv "${PART}"
+
   PARTSHA256="$(shasum -a 256 "${TMPTGZ}" | awk '{ print $1 }')"
 
-  mv "${TMPTGZ}" "${TMPDIR}/${PARTSHA256}"
+  mv -fv "${TMPTGZ}" "${TMPDIR}/${PARTSHA256}"
 
   PARTSHA256S+=("${PARTSHA256}")
 done
@@ -49,7 +51,7 @@ $(
 EOF
 CONFIGSIZE="$(stat -f '%z' "${CONFIGPATH}")"
 CONFIGSHA256="$(shasum -a 256 "${CONFIGPATH}" | awk '{ print $1 }')"
-mv "${CONFIGPATH}" "${TMPDIR}/${CONFIGSHA256}"
+mv -fv "${CONFIGPATH}" "${TMPDIR}/${CONFIGSHA256}"
 
 GITDES="$(git describe --always --dirty --tags)"
 GITREV="$(git rev-parse HEAD)"
@@ -92,5 +94,5 @@ $(
 }
 EOF
 
-rm -fR ./build
-mv "${TMPDIR}" ./build
+rm -Rfv ./build
+mv -fv "${TMPDIR}" ./build
