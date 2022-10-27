@@ -12,6 +12,7 @@ jobs:
     runs-on: macos-11
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
+      GO111MODULE: 'off'
       HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
       PACKER_GITHUB_API_TOKEN: ${{ github.token }}
       PACKER_LOG: '1'
@@ -19,6 +20,12 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
+      - name: setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.17'
+      - name: build and install tgzarmorer
+        run: go get -f -u -v -x github.com/inloco/xcode/tgzarmorer
       - name: install unttify
         run: cp ./hack/unttify.py /usr/local/bin/unttify
       - name: install and setup casks
