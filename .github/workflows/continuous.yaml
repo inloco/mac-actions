@@ -30,7 +30,8 @@ jobs:
         run: cp ./hack/unttify.py /usr/local/bin/unttify
       - name: install and setup casks
         run: |
-          brew install --cask packages vagrant vagrant-vmware-utility vmware-fusion
+          brew search --casks vmware-fusion | grep -q vmware-fusion12 && brew install --cask homebrew/cask-versions/vmware-fusion12 || brew install --cask vmware-fusion
+          brew install --cask packages vagrant vagrant-vmware-utility
           sh ./hack/kickstart-vmware.sh '${{ secrets.VMWARE_FUSION_SERIAL_NUMBER }}'
           vagrant plugin install vagrant-vmware-desktop
       - name: install and setup formulae
