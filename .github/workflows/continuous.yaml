@@ -1,8 +1,5 @@
 name: Continuous
-on:
-  push:
-    branches:
-      - master
+on: push
 permissions:
   contents: read
   id-token: write
