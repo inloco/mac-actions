@@ -34,7 +34,13 @@ build {
       "rm -Rfv /private/tmp/brew.sh",
 
       "HOMEBREW_INSTALL_FROM_API=1 brew install --formula jq mas skopeo xcinfo gh gnu-sed",
-      "HOMEBREW_INSTALL_FROM_API=1 brew install --cask intel-haxm",
+
+      # don't install through brew because of installation errors
+      # "brew install --cask intel-haxm",
+      "curl -sSLfo haxm.zip https://github.com/intel/haxm/releases/download/v7.8.0/haxm-macosx_v7_8_0.zip",
+      "unzip haxm.zip -d haxm",
+      "sudo bash haxm/silent_install.sh",
+      "rm -r haxm haxm.zip",
 
       # "mas install 497799835",
       # "xcinfo install ${var.xcode-version}",
