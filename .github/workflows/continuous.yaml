@@ -27,9 +27,15 @@ jobs:
         run: cp ./hack/unttify.py /usr/local/bin/unttify
       - name: install and setup casks
         run: |
-          brew install --cask homebrew/cask-versions/vmware-fusion12 packages hashicorp/tap/hashicorp-vagrant vagrant-vmware-utility
+          brew install --cask homebrew/cask-versions/vmware-fusion12 packages hashicorp/tap/hashicorp-vagrant
           sh ./hack/kickstart-vmware.sh '${{ secrets.VMWARE_FUSION_SERIAL_NUMBER }}'
           vagrant plugin install vagrant-vmware-desktop
+      - name: install vagrant-vmware-utility 
+        run: |
+          # brew install vagrant-vmware-utility
+          curl -sSLO https://releases.hashicorp.com/vagrant-vmware-utility/1.0.21/vagrant-vmware-utility_1.0.21_x86_64.dmg
+          sudo hdiutil attach vagrant-vmware-utility_1.0.21_x86_64.dmg
+          sudo installer -pkg /Volumes/Vagrant\ VMWare\ Utility/VagrantVMwareUtility.pkg -target /
       - name: install and setup formulae
         run: |
           brew install --formula jq packer parallel skopeo
