@@ -49,23 +49,8 @@ jobs:
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/ecr-public
-      - name: docker login
-        run: |
-          skopeo login -u '${{ secrets.DOCKERHUB_USER }}' -p '${{ secrets.DOCKERHUB_PASS }}' docker.io
-          skopeo login -u '${{ secrets.QUAY_USER }}' -p '${{ secrets.QUAY_PASS }}' quay.io
-          skopeo login -u '${{ github.actor }}' -p '${{ github.token }}' ghcr.io
-          skopeo login -u 'AWS' -p "$(aws ecr-public get-login-password)" public.ecr.aws
       - name: docker push
-        shell: '/usr/bin/env parallel --lb :::: {0}'
         run: |
-          make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci push
-          make 'IMAGE_REGISTRY=quay.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci push
-          make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=${{ github.repository }}' -C oci push
+          skopeo login -u 'AWS' -p "$(aws ecr-public get-login-password)" public.ecr.aws
           make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci push
-      - name: docker tag
-        shell: '/usr/bin/env parallel --lb :::: {0}'
-        run: |
-          make 'IMAGE_REGISTRY=docker.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci latest
-          make 'IMAGE_REGISTRY=quay.io' 'IMAGE_REPOSITORY=inloco/mactions' -C oci latest
-          make 'IMAGE_REGISTRY=ghcr.io' 'IMAGE_REPOSITORY=${{ github.repository }}' -C oci latest
           make 'IMAGE_REGISTRY=public.ecr.aws' 'IMAGE_REPOSITORY=incognia/mactions' -C oci latest
