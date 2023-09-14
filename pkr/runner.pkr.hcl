@@ -33,7 +33,7 @@ build {
       "HOMEBREW_INSTALL_FROM_API=1 /private/tmp/brew.sh",
       "rm -Rfv /private/tmp/brew.sh",
 
-      "HOMEBREW_INSTALL_FROM_API=1 brew install --formula jq mas skopeo xcinfo gh gnu-sed",
+      "HOMEBREW_INSTALL_FROM_API=1 brew install jq mas skopeo xcinfo gh gnu-sed",
 
       # don't install through brew because of installation errors
       # "brew install --cask intel-haxm",
