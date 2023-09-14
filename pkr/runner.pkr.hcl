@@ -33,7 +33,7 @@ build {
       "HOMEBREW_INSTALL_FROM_API=1 /private/tmp/brew.sh",
       "rm -Rfv /private/tmp/brew.sh",
 
-      "HOMEBREW_INSTALL_FROM_API=1 brew install jq mas skopeo xcinfo gh gnu-sed",
+      "HOMEBREW_INSTALL_FROM_API=1 brew install jq skopeo gh gnu-sed",
 
       # don't install through brew because of installation errors
       # "brew install --cask intel-haxm",
@@ -42,8 +42,6 @@ build {
       "sudo bash haxm/silent_install.sh",
       "rm -r haxm haxm.zip",
 
-      # "mas install 497799835",
-      # "xcinfo install ${var.xcode-version}",
       "skopeo copy --debug --command-timeout 1h docker://docker.io/inloco/xcode:${var.xcode-version} dir:///private/tmp/Xcode.dir",
       "tar -zxvf /private/tmp/Xcode.dir/$(jq -r '.layers[0].digest | split(\":\")[-1]' /private/tmp/Xcode.dir/manifest.json) -C /private/tmp",
       "cd /Applications && xip -x /private/tmp/Xcode.xip",
