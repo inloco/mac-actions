@@ -33,7 +33,7 @@ build {
       "HOMEBREW_INSTALL_FROM_API=1 /private/tmp/brew.sh",
       "rm -Rfv /private/tmp/brew.sh",
 
-      "HOMEBREW_INSTALL_FROM_API=1 brew install git jq skopeo gh gnu-sed parallel",
+      "HOMEBREW_INSTALL_FROM_API=1 brew install git jq skopeo awscli gh gnu-sed parallel",
 
       "sudo ln -s /usr/local/bin/gsed /usr/local/bin/sed",
       "sudo git config --system credential.helper ''",
