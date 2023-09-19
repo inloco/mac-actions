@@ -35,7 +35,7 @@ build {
 
       "HOMEBREW_INSTALL_FROM_API=1 brew install git jq skopeo gh gnu-sed parallel",
 
-      "echo \"$(brew --prefix)/opt/gnu-sed/libexec/gnubin\" | sudo tee -a /etc/paths",
+      "sudo ln -s /usr/local/bin/gsed /usr/local/bin/sed",
       "sudo git config --system credential.helper ''",
 
       # don't install through brew because of installation errors
