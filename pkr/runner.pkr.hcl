@@ -38,6 +38,11 @@ build {
       "sudo ln -s /usr/local/bin/gsed /usr/local/bin/sed",
       "sudo git config --system credential.helper ''",
 
+      # ruby/setup-ruby expects writable /Users/runner/hostedtoolcache
+      "sudo mkdir -p /Users/runner/hostedtoolcache",
+      "sudo ln -s /Users/runner/hostedtoolcache /Users/vagrant/hostedtoolcache",
+      "sudo chown vagrant /Users/vagrant/hostedtoolcache /Users/runner/hostedtoolcache",
+
       # don't install through brew because of installation errors
       # "brew install --cask intel-haxm",
       "curl -sSLfo haxm.zip https://github.com/intel/haxm/releases/download/v7.8.0/haxm-macosx_v7_8_0.zip",
